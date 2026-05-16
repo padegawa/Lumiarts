@@ -21,4 +21,4 @@ with a gallery, about section, and contact form.
 Uses [Formspree](https://formspree.io) for form submissions (free tier available).
 
 ## License
-© 2026 Your lumiarts. All artwork and content rights reserved.
+© 2026 lumiarts. All artwork and content rights reserved.
