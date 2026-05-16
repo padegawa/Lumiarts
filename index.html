@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Art Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0d0d0d;
+      --cream: #faf6ef;
+      --yellow: #f5d84b;
+      --coral: #f4603a;
+      --teal: #1fcab8;
+      --purple: #7c3aed;
+      --pink: #f472b6;
+      --white: #fff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      width: 14px; height: 14px;
+      background: var(--coral);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, width 0.2s, height 0.2s, background 0.2s;
+      mix-blend-mode: multiply;
+    }
+    .cursor.hovering { width: 36px; height: 36px; background: var(--yellow); }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 3rem;
+      background: var(--cream);
+      border-bottom: 2.5px solid var(--ink);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+    .nav-logo span { color: var(--coral); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none; color: var(--ink);
+      font-size: 0.9rem; font-weight: 500;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      position: relative;
+      transition: color 0.2s;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; left: 0; bottom: -3px;
+      width: 0; height: 2.5px;
+      background: var(--coral);
+      transition: width 0.25s ease;
+    }
+    .nav-links a:hover { color: var(--coral); }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* HERO */
+    #home {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 7rem 3rem 3rem;
+      gap: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg-shape {
+      position: absolute;
+      border-radius: 50%;
+      z-index: 0;
+      opacity: 0.18;
+      filter: blur(60px);
+    }
+    .hero-bg-shape.s1 { width: 500px; height: 500px; background: var(--yellow); top: -100px; right: -100px; }
+    .hero-bg-shape.s2 { width: 350px; height: 350px; background: var(--teal); bottom: 0; left: 40%; }
+
+    .hero-text { position: relative; z-index: 1; }
+    .hero-label {
+      display: inline-block;
+      background: var(--yellow);
+      color: var(--ink);
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.85rem;
+      border: 2px solid var(--ink);
+      margin-bottom: 1.4rem;
+      animation: fadeUp 0.6s ease both;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+    .hero-title .accent { color: var(--coral); font-style: italic; }
+    .hero-subtitle {
+      margin-top: 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 300;
+      line-height: 1.7;
+      max-width: 440px;
+      color: #444;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+    .hero-cta {
+      margin-top: 2.5rem;
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      animation: fadeUp 0.7s 0.3s ease both;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.85rem 2rem;
+      font-size: 0.9rem; font-weight: 500;
+      letter-spacing: 0.05em;
+      text-decoration: none;
+      border: 2.5px solid var(--ink);
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--ink); color: var(--white); }
+    .btn-primary:hover { background: var(--coral); border-color: var(--coral); }
+    .btn-secondary { background: transparent; color: var(--ink); }
+    .btn-secondary:hover { background: var(--yellow); }
+
+    /* Hero image mosaic */
+    .hero-mosaic {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 120px);
+      gap: 10px;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+    .mosaic-block {
+      border: 2.5px solid var(--ink);
+      overflow: hidden;
+      position: relative;
+    }
+    .mosaic-block:nth-child(1) { grid-column: 1/3; grid-row: 1/3; background: var(--coral); }
+    .mosaic-block:nth-child(2) { grid-column: 3; grid-row: 1; background: var(--yellow); }
+    .mosaic-block:nth-child(3) { grid-column: 3; grid-row: 2; background: var(--teal); }
+    .mosaic-block:nth-child(4) { grid-column: 1; grid-row: 3; background: var(--purple); }
+    .mosaic-block:nth-child(5) { grid-column: 2/4; grid-row: 3; background: var(--pink); }
+    .mosaic-label {
+      position: absolute; bottom: 8px; left: 10px;
+      font-size: 0.65rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+    }
+    .mosaic-block:nth-child(2) .mosaic-label,
+    .mosaic-block:nth-child(3) .mosaic-label { color: var(--ink); }
+
+    /* SECTION BASE */
+    section { padding: 6rem 3rem; }
+    .section-tag {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-size: 0.75rem; font-weight: 500;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      margin-bottom: 1rem;
+      color: var(--coral);
+    }
+    .section-tag::before {
+      content: '';
+      display: block; width: 30px; height: 2px;
+      background: var(--coral);
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    /* GALLERY */
+    #gallery { background: var(--ink); color: var(--white); }
+    #gallery .section-tag { color: var(--yellow); }
+    #gallery .section-tag::before { background: var(--yellow); }
+    #gallery .section-title { color: var(--white); }
+
+    .gallery-header {
+      display: flex; align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 3rem;
+      flex-wrap: wrap; gap: 1.5rem;
+    }
+    .gallery-filter {
+      display: flex; gap: 0.75rem; flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 0.5rem 1.2rem;
+      border: 2px solid rgba(255,255,255,0.25);
+      background: transparent;
+      color: rgba(255,255,255,0.7);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem; letter-spacing: 0.06em;
+      text-transform: uppercase; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--yellow);
+      border-color: var(--yellow);
+      color: var(--ink);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.08);
+      aspect-ratio: 4/3;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .gallery-item:hover { transform: scale(1.02); }
+    .gallery-item:nth-child(3n+1) { aspect-ratio: 4/5; }
+    .gallery-item-bg {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem;
+      transition: transform 0.5s ease;
+    }
+    .gallery-item:hover .gallery-item-bg { transform: scale(1.08); }
+    .gallery-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      display: flex; flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.2rem;
+    }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+    .gallery-item-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+    .gallery-item-tag {
+      display: inline-block;
+      background: var(--yellow); color: var(--ink);
+      font-size: 0.65rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      margin-top: 0.4rem;
+      align-self: flex-start;
+    }
+
+    /* ABOUT */
+    #about {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+    .about-visual {
+      position: relative;
+    }
+    .about-card {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: var(--coral);
+      border: 3px solid var(--ink);
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 6rem;
+      overflow: hidden;
+    }
+    .about-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        45deg, transparent, transparent 10px,
+        rgba(0,0,0,0.04) 10px, rgba(0,0,0,0.04) 20px
+      );
+    }
+    .about-card-offset {
+      position: absolute;
+      bottom: -14px; right: -14px;
+      width: 100%; height: 100%;
+      border: 3px solid var(--ink);
+      background: var(--yellow);
+      z-index: -1;
+    }
+    .about-badges {
+      position: absolute;
+      top: -18px; left: -18px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .about-badge {
+      background: var(--teal);
+      border: 2px solid var(--ink);
+      padding: 0.4rem 0.75rem;
+      font-size: 0.7rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .about-content { }
+    .about-intro {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-style: italic;
+      line-height: 1.5;
+      margin: 1.5rem 0;
+      color: #333;
+    }
+    .about-body {
+      font-size: 1rem; line-height: 1.8; color: #555;
+      margin-bottom: 2rem;
+    }
+    .about-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1rem; margin: 2rem 0;
+    }
+    .stat-box {
+      border: 2.5px solid var(--ink);
+      padding: 1rem;
+      text-align: center;
+      background: var(--white);
+    }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 900;
+      color: var(--coral);
+    }
+    .stat-label {
+      font-size: 0.7rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: #777; margin-top: 0.2rem;
+    }
+    .skills-list {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+    .skill-chip {
+      padding: 0.35rem 0.9rem;
+      border: 2px solid var(--ink);
+      font-size: 0.8rem; font-weight: 500;
+      background: transparent;
+    }
+    .skill-chip:nth-child(odd) { background: var(--yellow); }
+    .skill-chip:nth-child(3n) { background: var(--teal); }
+
+    /* CONTACT */
+    #contact { background: var(--purple); color: var(--white); }
+    #contact .section-tag { color: var(--pink); }
+    #contact .section-tag::before { background: var(--pink); }
+    #contact .section-title { color: var(--white); }
+
+    .contact-inner {
+      max-width: 640px;
+    }
+    .contact-desc {
+      margin: 1.5rem 0 2.5rem;
+      font-size: 1.05rem; line-height: 1.8;
+      color: rgba(255,255,255,0.75);
+    }
+    .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-field label {
+      font-size: 0.75rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+    }
+    .form-field input,
+    .form-field textarea,
+    .form-field select {
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.25);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      padding: 0.75rem 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      resize: none;
+    }
+    .form-field input::placeholder,
+    .form-field textarea::placeholder { color: rgba(255,255,255,0.4); }
+    .form-field input:focus,
+    .form-field textarea:focus,
+    .form-field select:focus { border-color: var(--pink); }
+    .form-field select option { background: var(--purple); color: var(--white); }
+    .contact-submit {
+      margin-top: 0.5rem;
+      padding: 1rem 2.5rem;
+      background: var(--yellow);
+      color: var(--ink);
+      border: 2.5px solid var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem; font-weight: 500;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: all 0.2s;
+    }
+    .contact-submit:hover { background: var(--pink); border-color: var(--pink); color: var(--white); }
+
+    .contact-links {
+      margin-top: 3rem;
+      display: flex; gap: 1rem; flex-wrap: wrap;
+    }
+    .contact-link {
+      padding: 0.6rem 1.2rem;
+      border: 2px solid rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      font-size: 0.8rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .contact-link:hover { background: var(--pink); border-color: var(--pink); color: var(--white); }
+
+    /* FOOTER */
+    footer {
+      background: var(--ink);
+      color: rgba(255,255,255,0.5);
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center; justify-content: space-between;
+      border-top: 2.5px solid rgba(255,255,255,0.08);
+      flex-wrap: wrap; gap: 1rem;
+    }
+    footer .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 900;
+      color: var(--white);
+    }
+    footer .logo span { color: var(--coral); }
+    footer p { font-size: 0.8rem; }
+
+    /* LIGHTBOX */
+    .lightbox {
+      display: none;
+      position: fixed; inset: 0;
+      z-index: 500;
+      background: rgba(0,0,0,0.92);
+      align-items: center; justify-content: center;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-inner {
+      position: relative;
+      max-width: 700px; width: 90%;
+      border: 3px solid rgba(255,255,255,0.15);
+    }
+    .lightbox-content {
+      width: 100%;
+      min-height: 400px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8rem;
+    }
+    .lightbox-info {
+      background: var(--ink);
+      padding: 1.2rem 1.5rem;
+      border-top: 2px solid rgba(255,255,255,0.1);
+    }
+    .lightbox-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; color: var(--white);
+    }
+    .lightbox-meta {
+      font-size: 0.8rem; color: rgba(255,255,255,0.5);
+      margin-top: 0.3rem;
+    }
+    .lightbox-close {
+      position: absolute; top: -18px; right: -18px;
+      width: 40px; height: 40px;
+      background: var(--coral);
+      border: 2.5px solid var(--ink);
+      color: var(--white);
+      font-size: 1.2rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { gap: 1.2rem; }
+      #home { grid-template-columns: 1fr; padding: 6rem 1.5rem 3rem; }
+      .hero-mosaic { display: none; }
+      section { padding: 4rem 1.5rem; }
+      #about { grid-template-columns: 1fr; gap: 3rem; }
+      .form-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; align-items: flex-start; }
+      .hero-title { font-size: 2.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Studio<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-bg-shape s1"></div>
+  <div class="hero-bg-shape s2"></div>
+
+  <div class="hero-text">
+    <span class="hero-label">✦ Artist & Illustrator</span>
+    <h1 class="hero-title">
+      Making the world<br><span class="accent">beautifully</span><br>strange.
+    </h1>
+    <p class="hero-subtitle">
+      Digital illustrations and original paintings that blend vivid color with raw emotion. Available for commissions, collaborations, and prints.
+    </p>
+    <div class="hero-cta">
+      <a href="#gallery" class="btn btn-primary">View My Work</a>
+      <a href="#contact" class="btn btn-secondary">Get in Touch</a>
+    </div>
+  </div>
+
+  <div class="hero-mosaic">
+    <div class="mosaic-block"><span class="mosaic-label">Digital</span></div>
+    <div class="mosaic-block"><span class="mosaic-label">Painting</span></div>
+    <div class="mosaic-block"><span class="mosaic-label">Color</span></div>
+    <div class="mosaic-block"><span class="mosaic-label">Abstract</span></div>
+    <div class="mosaic-block"><span class="mosaic-label">Illustration</span></div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="gallery-header">
+    <div>
+      <div class="section-tag">Portfolio</div>
+      <h2 class="section-title">Selected Works</h2>
+    </div>
+    <div class="gallery-filter">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="digital">Digital</button>
+      <button class="filter-btn" data-filter="painting">Painting</button>
+    </div>
+  </div>
+
+  <div class="gallery-grid" id="galleryGrid">
+    <!-- Items injected by JS -->
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-visual reveal">
+    <div class="about-badges">
+      <div class="about-badge">Open to Commissions</div>
+      <div class="about-badge">Available for Prints</div>
+    </div>
+    <div class="about-card">🎨
+      <div class="about-card-offset"></div>
+    </div>
+  </div>
+
+  <div class="about-content reveal">
+    <div class="section-tag">About Me</div>
+    <h2 class="section-title">Color is my<br><em>first language.</em></h2>
+
+    <p class="about-intro">"I paint the feelings that words can't hold."</p>
+    <p class="about-body">
+      I'm an independent artist working in digital illustration and traditional painting. My work draws from surrealism, folk art, and everyday emotion — turning fleeting feelings into bold, lasting images.
+      <br><br>
+      Whether I'm working digitally with a stylus or mixing paint on a real canvas, I'm always chasing that one perfect color that makes everything click.
+    </p>
+
+    <div class="about-stats">
+      <div class="stat-box">
+        <div class="stat-num">80+</div>
+        <div class="stat-label">Works Created</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">35+</div>
+        <div class="stat-label">Clients</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">6</div>
+        <div class="stat-label">Years Active</div>
+      </div>
+    </div>
+
+    <div class="skills-list">
+      <span class="skill-chip">Procreate</span>
+      <span class="skill-chip">Photoshop</span>
+      <span class="skill-chip">Oil Paint</span>
+      <span class="skill-chip">Watercolor</span>
+      <span class="skill-chip">Gouache</span>
+      <span class="skill-chip">Ink</span>
+      <span class="skill-chip">Illustration</span>
+    </div>
+
+    <div class="hero-cta" style="margin-top:2rem;">
+      <a href="#contact" class="btn btn-primary">Commission a Piece</a>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner reveal">
+    <div class="section-tag">Contact</div>
+    <h2 class="section-title">Let's create<br>something together.</h2>
+    <p class="contact-desc">
+      Have a project in mind? Want a custom piece for your home or brand? I'd love to hear from you. Fill out the form below and I'll reply within 48 hours.
+    </p>
+
+    <div class="contact-form" id="contactForm">
+      <div class="form-row">
+        <div class="form-field">
+          <label>Your Name</label>
+          <input type="text" placeholder="Jane Smith" id="nameInput"/>
+        </div>
+        <div class="form-field">
+          <label>Email Address</label>
+          <input type="email" placeholder="jane@example.com" id="emailInput"/>
+        </div>
+      </div>
+      <div class="form-field">
+        <label>Subject</label>
+        <select id="subjectInput">
+          <option value="">Select a subject…</option>
+          <option>Commission a Piece</option>
+          <option>Buy a Print</option>
+          <option>Collaboration</option>
+          <option>General Enquiry</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Message</label>
+        <textarea rows="5" placeholder="Tell me about your idea…" id="messageInput"></textarea>
+      </div>
+      <button class="contact-submit" id="submitBtn" onclick="handleSubmit()">Send Message →</button>
+    </div>
+
+    <div class="contact-links">
+      <a href="https://instagram.com" target="_blank" class="contact-link">Instagram</a>
+      <a href="https://behance.net" target="_blank" class="contact-link">Behance</a>
+      <a href="mailto:hello@youremail.com" class="contact-link">Email Directly</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">Studio<span>.</span></div>
+  <p>Replace placeholder content with your own work & info.</p>
+  <p>Built with GitHub Pages</p>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <div class="lightbox-content" id="lightboxContent"></div>
+    <div class="lightbox-info">
+      <div class="lightbox-title" id="lightboxTitle"></div>
+      <div class="lightbox-meta" id="lightboxMeta"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, button, .gallery-item, .filter-btn').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+  });
+
+  // Gallery data — replace emoji + info with real images
+  const works = [
+    { emoji: '🌊', title: 'Tide Memory', tag: 'digital', year: '2024', medium: 'Digital Illustration', color: '#1fcab8' },
+    { emoji: '🔥', title: 'Burning Season', tag: 'painting', year: '2024', medium: 'Oil on Canvas', color: '#f4603a' },
+    { emoji: '🌸', title: 'Pink Reverie', tag: 'digital', year: '2023', medium: 'Digital Illustration', color: '#f472b6' },
+    { emoji: '🌙', title: 'Night Ritual', tag: 'painting', year: '2023', medium: 'Gouache', color: '#7c3aed' },
+    { emoji: '🦋', title: 'Becoming', tag: 'digital', year: '2024', medium: 'Procreate', color: '#f5d84b' },
+    { emoji: '🏔️', title: 'Summit Dream', tag: 'painting', year: '2022', medium: 'Watercolor', color: '#1fcab8' },
+    { emoji: '🌿', title: 'Green Thoughts', tag: 'digital', year: '2023', medium: 'Digital Illustration', color: '#22c55e' },
+    { emoji: '✨', title: 'Stardust Hour', tag: 'painting', year: '2024', medium: 'Acrylic', color: '#f4603a' },
+    { emoji: '🎭', title: 'Behind the Mask', tag: 'digital', year: '2022', medium: 'Photoshop', color: '#7c3aed' },
+  ];
+
+  function buildGallery(filter = 'all') {
+    const grid = document.getElementById('galleryGrid');
+    grid.innerHTML = '';
+    works.filter(w => filter === 'all' || w.tag === filter).forEach((w, i) => {
+      const item = document.createElement('div');
+      item.className = 'gallery-item';
+      item.innerHTML = `
+        <div class="gallery-item-bg" style="background:${w.color}20; color:${w.color};">${w.emoji}</div>
+        <div class="gallery-overlay">
+          <div class="gallery-item-title">${w.title}</div>
+          <span class="gallery-item-tag">${w.medium}</span>
+        </div>`;
+      item.onclick = () => openLightbox(w);
+      grid.appendChild(item);
+    });
+  }
+  buildGallery();
+
+  // Filter
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      buildGallery(btn.dataset.filter);
+    });
+  });
+
+  // Lightbox
+  function openLightbox(w) {
+    document.getElementById('lightboxContent').innerHTML =
+      `<div style="background:${w.color}30; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:7rem;">${w.emoji}</div>`;
+    document.getElementById('lightboxTitle').textContent = w.title;
+    document.getElementById('lightboxMeta').textContent = `${w.medium} · ${w.year}`;
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+  document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.15 });
+  reveals.forEach(r => observer.observe(r));
+
+  // Contact form
+  function handleSubmit() {
+    const name = document.getElementById('nameInput').value;
+    const email = document.getElementById('emailInput').value;
+    const subject = document.getElementById('subjectInput').value;
+    const message = document.getElementById('messageInput').value;
+    if (!name || !email || !subject || !message) {
+      alert('Please fill in all fields.');
+      return;
+    }
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = '✓ Message Sent!';
+    btn.style.background = '#1fcab8';
+    btn.disabled = true;
+    // Wire to Formspree: replace action URL with https://formspree.io/f/YOUR_ID
+  }
+</script>
+</body>
+</html>
